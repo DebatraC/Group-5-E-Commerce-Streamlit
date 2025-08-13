@@ -45,12 +45,28 @@ st.markdown("""
 def load_and_preprocess_data():
     """Load and preprocess the customer data"""
     try:
-        # Try to load the data from the workspace
-        data_path = '../mytestdata.parquet'
-        data = pd.read_parquet(data_path)
-        return data
-    except:
-        # If file not found, return None
+        # Try to load the data from the workspace - multiple possible locations
+        possible_paths = [
+            '../mytestdata.parquet',  # Parent directory of src (customer-segmentation-streamlit/)
+            './mytestdata.parquet',   # Current directory
+            'mytestdata.parquet',     # Same directory as app
+            '../../mytestdata.parquet',  # Two levels up (main project directory)
+            # '../customer_data.parquet',  # Alternative data file in parent of src
+            # '../../customer_data.parquet'  # Alternative data file in main project
+        ]
+        
+        for data_path in possible_paths:
+            try:
+                data = pd.read_parquet(data_path)
+                st.info(f"✅ Data loaded successfully from: {data_path}")
+                return data
+            except FileNotFoundError:
+                continue
+        
+        # If none of the paths work, return None
+        return None
+    except Exception as e:
+        st.error(f"Error loading data: {str(e)}")
         return None
 
 def fill_missing_brand(group):
@@ -310,11 +326,20 @@ def main():
     data = load_and_preprocess_data()
     
     if data is None:
-        st.error("Could not load data. Please ensure the data file exists in the correct location.")
-        st.info("Expected location: ../mytestdata.parquet")
+        st.error("❌ Could not load data from any of the expected locations.")
+        st.info("📁 **Searched in the following locations:**")
+        st.code("""
+        • ../mytestdata.parquet (customer-segmentation-streamlit/)
+        • ./mytestdata.parquet  (current directory)
+        • mytestdata.parquet (same as app)
+        • ../../mytestdata.parquet (main project directory)
+        • ../customer_data.parquet (alternative file)
+        • ../../customer_data.parquet (alternative in main project)
+        """)
         
         # Allow file upload as fallback
-        st.markdown("### Upload Data File")
+        st.markdown("### 📤 Upload Data File")
+        st.info("Please upload your `mytestdata.parquet` or `customer_data.csv` file below:")
         uploaded_file = st.file_uploader("Choose a file", type=['csv', 'parquet'])
         
         if uploaded_file is not None:
@@ -322,6 +347,7 @@ def main():
                 data = pd.read_csv(uploaded_file)
             else:
                 data = pd.read_parquet(uploaded_file)
+            st.success("✅ Data uploaded successfully!")
         else:
             st.stop()
     
