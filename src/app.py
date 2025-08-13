@@ -46,7 +46,7 @@ def load_and_preprocess_data():
     """Load and preprocess the customer data"""
     try:
         # Try to load the data from the workspace
-        data_path = '../mytestdata.parquet'
+        data_path = './mytestdata.parquet'
         data = pd.read_parquet(data_path)
         return data
     except:
