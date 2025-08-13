@@ -49,10 +49,11 @@ def load_and_preprocess_data():
         possible_paths = [
             'mytestdata.parquet',     # Same directory as app (most likely for cloud)
             './mytestdata.parquet',   # Current directory
-            '../mytestdata.parquet',  # Parent directory of src
-            '../../mytestdata.parquet',  # Two levels up (main project directory)
-            '../customer_data.parquet',  # Alternative data file in parent of src
-            '../../customer_data.parquet'  # Alternative data file in main project
+            'src/mytestdata.parquet', # In src subdirectory
+            '../mytestdata.parquet',  # Parent directory
+            '../../mytestdata.parquet',  # Two levels up
+            'customer_data.parquet',  # Alternative data file
+            '../customer_data.parquet'  # Alternative data file in parent
         ]
         
         for data_path in possible_paths:
